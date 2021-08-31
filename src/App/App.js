@@ -3,19 +3,26 @@ import React, { Component, Fragment } from 'react';
 import './App.css';
 import * as Api from '../services/api';
 import Searchbar from '../components/Searchbar';
-import Modal from '../components/Modal';
+//import Modal from '../components/Modal';
 import ImageGallery from '../components/ImageGallery';
 import { ToastContainer } from 'react-toastify';
 import ErrorMessage from '../components/ErrorMessage/ErrorMessage';
 
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
+
 class App extends Component {
   state = {
-    showModal: false,
+    //showModal: false,
     request: '',
     page: 1,
     images: [],
     isLoading: false,
-    status: 'idle',
+    status: Status.IDLE,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -23,25 +30,25 @@ class App extends Component {
     const next = this.state.request;
 
     if (prev !== next) {
-      this.setState({ status: 'pending' });
+      this.setState({ status: Status.PENDING });
       const { request, page } = this.state;
       Api.fetchImages(request, page)
         .then(({ data }) =>
           this.setState(prevState => ({
             images: [...prevState.images, ...data.hits],
             page: prevState.page + 1,
-            status: 'resolved',
+            status: Status.RESOLVED,
           })),
         )
-        .catch(error => this.setState({ error, status: 'rejected' }));
+        .catch(error => this.setState({ error, status: Status.REJECTED }));
     }
   }
-
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
-  };
+  //Переношу в Гэллери айтем
+  // toggleModal = () => {
+  //   this.setState(({ showModal }) => ({
+  //     showModal: !showModal,
+  //   }));
+  // };
 
   handleFormSubmit = newRequest => {
     this.setState({ request: newRequest, page: 1, images: [] });
@@ -49,15 +56,15 @@ class App extends Component {
 
   render() {
     // console.log("App render");
-    const { showModal, error, status } = this.state;
+    const { error, status } = this.state;
 
-    if (status === 'idle') {
+    if (status === Status.IDLE) {
       return (
         <div>
           <Searchbar onSubmit={this.handleFormSubmit} />
           <ToastContainer
             position="top-center"
-            autoClose={3000}
+            autoClose={2000}
             theme={'colored'}
             hideProgressBar={false}
             newestOnTop={false}
@@ -71,13 +78,13 @@ class App extends Component {
       );
     }
 
-    if (status === 'pending') {
+    if (status === Status.PENDING) {
       return <div>Loading...</div>;
     }
-    if (status === 'rejected') {
+    if (status === Status.REJECTED) {
       return <ErrorMessage message={error.message} />;
     }
-    if (status === 'resolved') {
+    if (status === Status.RESOLVED) {
       return (
         <Fragment>
           <Searchbar onSubmit={this.handleFormSubmit} />
@@ -95,16 +102,9 @@ class App extends Component {
           />
           <ImageGallery images={this.state.images} />
           {/* <ContactsForm onSubmit={this.handleSubmit} /> */}
-          <button type="button" onClick={this.toggleModal}>
+          {/* <button type="button" onClick={this.toggleModal}>
             open/close
-          </button>
-          {showModal && (
-            <Modal onClose={this.toggleModal}>
-              <button type="button" onClick={this.toggleModal}>
-                open/close
-              </button>
-            </Modal>
-          )}
+          </button> */}
         </Fragment>
       );
     }

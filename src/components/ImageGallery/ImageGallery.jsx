@@ -10,7 +10,7 @@ function ImageGallery({ images }) {
           key={image.id}
           src={image.webformatURL}
           alt={image.tags}
-          largeImageUrl={image.largeImageUrl}
+          largeImageURL={image.largeImageURL}
         />
       ))}
     </ul>
