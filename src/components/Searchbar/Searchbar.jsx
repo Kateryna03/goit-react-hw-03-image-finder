@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-// import { toast } from 'react-tostify';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import styles from './Searchbar.module.css';
 
 // Компонент принимает один проп onSubmit - функцию для передачи значения инпута при сабмите формы. Создает DOM-элемент следующей структуры.
@@ -16,8 +17,18 @@ class Searchbar extends Component {
     e.preventDefault();
 
     if (this.state.request.trim() === '') {
-      return alert('введите поиск');
-      // return toast.error('введите параметры поиска');
+      //   return alert('введите поиск');
+      toast.warn('🦄 введите запрос!', {
+        position: 'top-center',
+        autoClose: 3000,
+        theme: 'colored',
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
     }
     this.props.onSubmit(this.state.request);
     this.setState({ request: '' });
