@@ -18,15 +18,17 @@ class Searchbar extends Component {
 
     if (this.state.request.trim() === '') {
       //   return alert('введите поиск');
-      toast.warn('🦄 введите запрос!', {
+      toast.warn('🦄 enter your request!', {
         position: 'top-center',
         autoClose: 3000,
         theme: 'colored',
         hideProgressBar: false,
+        newestOnTop: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
+        rtl: false,
+        //progress: undefined,
       });
       return;
     }

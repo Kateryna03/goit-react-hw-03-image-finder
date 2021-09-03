@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 //import shortid from 'shortid';
 //import './App.css';
-import * as Api from '../services/api';
+import * as Api from '../services/Api';
 import Searchbar from '../components/Searchbar';
 //import Modal from '../components/Modal';
 import ImageGallery from '../components/ImageGallery';
@@ -39,18 +39,6 @@ class App extends Component {
 
     if (prev !== next) {
       this.pageRender();
-      // this.setState({ status: Status.PENDING });
-      // const { request, page } = this.state;
-      // Api.fetchImages(request, page)
-      //   .then(({ data }) =>
-      //     this.setState(prevState => ({
-      //       images: [...prevState.images, ...data.hits],
-      //       page: prevState.page + 1,
-      //       status: Status.RESOLVED,
-      //     })),
-
-      // )
-      //  .catch(error => this.setState({ error, status: Status.REJECTED }));
     }
   }
 
@@ -66,41 +54,19 @@ class App extends Component {
     const { request, page } = this.state;
     this.setState({ status: Status.PENDING });
     Api.fetchImages(request, page)
-      .then(data => {
-        console.log(data);
-        if (page === 1) {
-          if (data.hits.length === 0) {
-            toast.error('No result were found for your search', {
-              theme: 'colored',
-              position: 'top-left',
-              autoClose: 5000,
-            });
-            return this.setState({ status: Status.IDLE });
-          }
-          this.setState({
-            images: data.hits,
-            status: Status.RESOLVED,
-          });
-        } else {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...data.hits],
-            status: Status.RESOLVED,
-          }));
+      .then(({ data }) => {
+        if (data.hits.length === 0) {
+          console.log({ data });
+          this.setState({ status: Status.IDLE });
+          toast.error('No result were found for your search');
+          return;
         }
+        this.setState(prevState => ({
+          images: [...prevState.images, ...data.hits],
+          page: prevState.page + 1,
+          status: Status.RESOLVED,
+        }));
       })
-
-      // .then(({ data }) => {
-      //   if (data.hits.length === 0) {
-      //     //console.log('')
-      //     this.setState({status:Status.IDLE})
-      //   };
-      //   this.setState(prevState => ({
-      //     images: [...prevState.images, ...data.hits],
-      //     page: prevState.page + 1,
-      //     status: Status.RESOLVED,
-      //   }))
-      // }
-      // )
       .catch(error => this.setState({ error, status: Status.REJECTED }));
   };
 
@@ -116,18 +82,7 @@ class App extends Component {
       return (
         <div>
           <Searchbar onSubmit={this.handleFormSubmit} />
-          <ToastContainer
-            position="top-center"
-            autoClose={2000}
-            theme={'colored'}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
+          <ToastContainer />
         </div>
       );
     }
@@ -137,36 +92,16 @@ class App extends Component {
     }
 
     if (status === Status.REJECTED) {
-      //console.log(error);
+      console.log(error);
       return <ErrorMessage message={error} />;
-
-      // (
-      // <Fragment>
-      //   <ErrorMessage message={error.message} />;
-      // </Fragment>)
     }
 
     if (status === Status.RESOLVED) {
       return (
         <Fragment>
           <Searchbar onSubmit={this.handleFormSubmit} />
-          <ToastContainer
-            position="top-center"
-            autoClose={3000}
-            theme={'colored'}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
+          <ToastContainer />
           <ImageGallery images={this.state.images} />
-          {/* <ContactsForm onSubmit={this.handleSubmit} /> */}
-          {/* <button type="button" onClick={this.toggleModal}>
-            open/close
-          </button> */}
           <Button OnClick={this.pageRender}></Button>
         </Fragment>
       );
