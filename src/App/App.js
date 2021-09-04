@@ -32,10 +32,10 @@ class App extends Component {
     const prev = prevState.request;
     const next = this.state.request;
 
-    if (this.state.page >= 2) {
-      //console.log(this.state.page);
-      this.scrollOnLoadButton();
-    }
+    // if (this.state.page >= 2) {
+    //   //console.log(this.state.page);
+    //   this.scrollOnLoadButton();
+    // }
 
     if (prev !== next) {
       this.pageRender();
@@ -52,7 +52,7 @@ class App extends Component {
 
   pageRender = () => {
     const { request, page } = this.state;
-    this.setState({ status: Status.PENDING });
+    this.setState({ isLoading: true });
     Api.fetchImages(request, page)
       .then(({ data }) => {
         if (data.hits.length === 0) {
@@ -67,7 +67,10 @@ class App extends Component {
           status: Status.RESOLVED,
         }));
       })
-      .catch(error => this.setState({ error, status: Status.REJECTED }));
+      .catch(error => this.setState({ error, status: Status.REJECTED }))
+      .finally(() =>
+        this.setState({ status: Status.RESOLVED, isLoading: false }),
+      );
   };
 
   handleFormSubmit = newRequest => {
@@ -76,14 +79,14 @@ class App extends Component {
 
   render() {
     // console.log("App render");
-    const { error, status } = this.state;
+    const { error, status, images } = this.state;
 
     if (status === Status.IDLE) {
       return (
-        <div>
+        <>
           <Searchbar onSubmit={this.handleFormSubmit} />
           <ToastContainer />
-        </div>
+        </>
       );
     }
 
@@ -92,7 +95,7 @@ class App extends Component {
     }
 
     if (status === Status.REJECTED) {
-      console.log(error);
+      //console.log(error);
       return <ErrorMessage message={error} />;
     }
 
@@ -101,8 +104,9 @@ class App extends Component {
         <Fragment>
           <Searchbar onSubmit={this.handleFormSubmit} />
           <ToastContainer />
-          <ImageGallery images={this.state.images} />
-          <Button OnClick={this.pageRender}></Button>
+          <ImageGallery images={images} />
+          {images.length > 12 && this.scrollOnLoadButton()}
+          {images.length > 0 && <Button OnClick={this.pageRender}></Button>}
         </Fragment>
       );
     }
