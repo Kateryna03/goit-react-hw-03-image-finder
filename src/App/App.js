@@ -32,11 +32,6 @@ class App extends Component {
     const prev = prevState.request;
     const next = this.state.request;
 
-    // if (this.state.page >= 2) {
-    //   //console.log(this.state.page);
-    //   this.scrollOnLoadButton();
-    // }
-
     if (prev !== next) {
       this.pageRender();
     }
@@ -66,6 +61,10 @@ class App extends Component {
           page: prevState.page + 1,
           status: Status.RESOLVED,
         }));
+        if (page !== 1) {
+          //console.log('_________--------');
+          this.scrollOnLoadButton();
+        }
       })
       .catch(error => this.setState({ error, status: Status.REJECTED }))
       .finally(() =>
@@ -105,8 +104,9 @@ class App extends Component {
           <Searchbar onSubmit={this.handleFormSubmit} />
           <ToastContainer />
           <ImageGallery images={images} />
-          {images.length > 12 && this.scrollOnLoadButton()}
-          {images.length > 0 && <Button OnClick={this.pageRender}></Button>}
+          {/* {images.length > 12 && console.log("вызвался скролл__________",this.scrollOnLoadButton())
+          } */}
+          {images.length >= 12 && <Button OnClick={this.pageRender}></Button>}
         </Fragment>
       );
     }
